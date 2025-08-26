@@ -1,6 +1,6 @@
 package de.flix29.sproutdemo;
 
-import de.flix29.sproutdemo.entities.generated.controller.SproutProductEntityController;
+import de.flix29.sproutdemo.entities.generated.controllers.SproutProductEntityController;
 import de.flix29.sproutdemo.entities.generated.repositories.SproutProductEntityRepository;
 import de.flix29.sproutdemo.entities.generated.services.SproutProductEntityService;
 import org.junit.jupiter.api.Test;
