@@ -34,7 +34,7 @@ jobs:
       - name: Build & install Sprout (annotations + processor)
         working-directory: sprout-src
         run: |
-          mvn -q -DskipTests install -pl sprout-annotations,sprout-processor -am
+          mvn -U -DskipTests install -pl sprout-annotations,sprout-processor -am
 
       - name: Read Sprout version
         id: ver
@@ -48,4 +48,4 @@ jobs:
           SPROUT_VERSION: ${{ steps.ver.outputs.version }}
         run: |
           echo "Using Sprout version: ${SPROUT_VERSION}"
-          mvn -q -B -Dsprout.version="${SPROUT_VERSION}" clean verify
+          mvn -B -U -Dsprout.version="${SPROUT_VERSION}" clean verify
