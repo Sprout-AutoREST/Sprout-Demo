@@ -8,17 +8,44 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
-      - name: Checkout code
+      - name: Checkout Sprout-Demo
         uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Checkout Sprout
+        uses: actions/checkout@v4
+        with:
+          repository: flix-29/sprout
+          path: sprout-src
+          ref: main
+          token: ${{ secrets.SPROUT_READ_TOKEN }}
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '21'
           cache: maven
 
-      - name: Build project with Maven
-        run: mvn -B -U clean verify
+      - name: Build & install Sprout (annotations + processor)
+        working-directory: sprout-src
+        run: |
+          mvn -q -DskipTests install -pl sprout-annotations,sprout-processor -am
+
+      - name: Read Sprout version
+        id: ver
+        working-directory: sprout-src/sprout-annotations
+        run: |
+          V=$(mvn -q -DforceStdout -Dexpression=project.version help:evaluate)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Build demo
+        env:
+          SPROUT_VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          echo "Using Sprout version: ${SPROUT_VERSION}"
+          mvn -q -B -Dsprout.version="${SPROUT_VERSION}" clean verify
