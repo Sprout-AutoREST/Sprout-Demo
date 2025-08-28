@@ -1,31 +1,39 @@
-package de.flix29.sproutdemo.entities.generated.controllers;
+package de.flix29.sproutdemo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.flix29.sproutdemo.entities.ProductEntity;
+import de.flix29.sproutdemo.entities.generated.controllers.SproutProductEntityController;
 import de.flix29.sproutdemo.entities.generated.services.SproutProductEntityService;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SproutProductEntityController.class)
-class SproutProductEntityControllerMockMvcTest {
+class ControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private SproutProductEntityService service;
 
     @Autowired
@@ -37,8 +45,19 @@ class SproutProductEntityControllerMockMvcTest {
 
         mockMvc.perform(get("/products"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].name").value("Widget"));
+    }
+
+    @Test
+    void getAllReturnsEmptyListWhenNoProducts() throws Exception {
+        given(service.findAll()).willReturn(List.of());
+
+        mockMvc.perform(get("/products"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
     }
 
     @Test
@@ -74,6 +93,24 @@ class SproutProductEntityControllerMockMvcTest {
     }
 
     @Test
+    void createInvalidProductReturnsBadRequest() throws Exception {
+        ProductEntity invalidProduct = new ProductEntity("", BigDecimal.valueOf(-1));
+
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidProduct)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createInvalidMediaTypeReturnsUnsupportedMediaType() throws Exception {
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content("Invalid content"))
+                .andExpect(status().isUnsupportedMediaType());
+    }
+
+    @Test
     void updateReturnsUpdatedProduct() throws Exception {
         ProductEntity updated = new ProductEntity("Widget", BigDecimal.TEN);
         updated.setId(1L);
@@ -83,6 +120,8 @@ class SproutProductEntityControllerMockMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Widget"))
                 .andExpect(jsonPath("$.price").value(10));
     }
 
@@ -94,6 +133,20 @@ class SproutProductEntityControllerMockMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.TEN))))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateIgnoreIdInBody() throws Exception {
+        ProductEntity updated = new ProductEntity("Widget", BigDecimal.TEN);
+        updated.setId(2L);
+        given(service.update(eq(1L), any(ProductEntity.class))).willReturn(Optional.of(updated));
+
+        mockMvc.perform(put("/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updated)))
+                .andExpect(status().isOk());
+
+        verify(service).update(eq(1L), any(ProductEntity.class));
     }
 
     @Test
@@ -110,15 +163,5 @@ class SproutProductEntityControllerMockMvcTest {
 
         mockMvc.perform(delete("/products/99"))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void createReturnsBadRequestForInvalidInput() throws Exception {
-        ProductEntity invalid = new ProductEntity("", BigDecimal.valueOf(-1));
-
-        mockMvc.perform(post("/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalid)))
-                .andExpect(status().isBadRequest());
     }
 }
