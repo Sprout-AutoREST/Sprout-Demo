@@ -34,7 +34,7 @@ jobs:
       - name: Build & install Sprout (annotations + processor)
         working-directory: sprout-src
         run: |
-          mvn -U -DskipTests install -pl sprout-annotations,sprout-processor -am
+          mvn -U -DskipTests install
 
       - name: Read Sprout version
         id: ver
