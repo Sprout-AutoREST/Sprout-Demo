@@ -55,6 +55,11 @@
             <artifactId>sprout-annotations</artifactId>
             <version>${sprout.version}</version>
         </dependency>
+        <dependency>
+            <groupId>de.flix29</groupId>
+            <artifactId>sprout-runtime</artifactId>
+            <version>${sprout.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

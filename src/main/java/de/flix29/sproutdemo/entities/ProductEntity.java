@@ -1,7 +1,7 @@
 package de.flix29.sproutdemo.entities;
 
-import de.flix29.annotations.SproutId;
-import de.flix29.annotations.SproutResource;
+import de.flix29.sprout.annotations.SproutId;
+import de.flix29.sprout.annotations.SproutResource;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
