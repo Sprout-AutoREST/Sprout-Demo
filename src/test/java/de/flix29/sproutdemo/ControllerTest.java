@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(SproutProductEntityController.class)
 class ControllerTest {
@@ -45,7 +46,7 @@ class ControllerTest {
     void getAllReturnsProducts() throws Exception {
         given(service.findAll()).willReturn(List.of(new ProductEntity("Widget", BigDecimal.ONE)));
 
-        mockMvc.perform(get("/products"))
+        mockMvc.perform(get("/products").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].name").value("Widget"));
@@ -56,7 +57,7 @@ class ControllerTest {
     void getAllReturnsEmptyListWhenNoProducts() throws Exception {
         given(service.findAll()).willReturn(List.of());
 
-        mockMvc.perform(get("/products"))
+        mockMvc.perform(get("/products").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
@@ -66,7 +67,7 @@ class ControllerTest {
     @Test
     @WithMockUser(roles = "GUEST")
     void getAllRequiresUserRole() throws Exception {
-        mockMvc.perform(get("/products"))
+        mockMvc.perform(get("/products").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -77,7 +78,7 @@ class ControllerTest {
         product.setId(1L);
         given(service.findById(1L)).willReturn(Optional.of(product));
 
-        mockMvc.perform(get("/products/1"))
+        mockMvc.perform(get("/products/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
     }
@@ -87,14 +88,14 @@ class ControllerTest {
     void getByIdReturnsNotFoundWhenMissing() throws Exception {
         given(service.findById(99L)).willReturn(Optional.empty());
 
-        mockMvc.perform(get("/products/99"))
+        mockMvc.perform(get("/products/99").with(csrf()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(roles = "GUEST")
     void getByIdRequiresUserRole() throws Exception {
-        mockMvc.perform(get("/products/1"))
+        mockMvc.perform(get("/products/1").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -105,7 +106,7 @@ class ControllerTest {
         product.setId(1L);
         given(service.save(any(ProductEntity.class))).willReturn(product);
 
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/products").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.ONE))))
                 .andExpect(status().isCreated())
@@ -117,7 +118,7 @@ class ControllerTest {
     void createInvalidProductReturnsBadRequest() throws Exception {
         ProductEntity invalidProduct = new ProductEntity("", BigDecimal.valueOf(-1));
 
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/products").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidProduct)))
                 .andExpect(status().isBadRequest());
@@ -126,7 +127,7 @@ class ControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void createInvalidMediaTypeReturnsUnsupportedMediaType() throws Exception {
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/products").with(csrf())
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("Invalid content"))
                 .andExpect(status().isUnsupportedMediaType());
@@ -135,7 +136,7 @@ class ControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void createRequiresAdminRole() throws Exception {
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/products").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.ONE))))
                 .andExpect(status().isForbidden());
@@ -148,7 +149,7 @@ class ControllerTest {
         updated.setId(1L);
         given(service.update(eq(1L), any(ProductEntity.class))).willReturn(Optional.of(updated));
 
-        mockMvc.perform(put("/products/1")
+        mockMvc.perform(put("/products/1").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk())
@@ -162,7 +163,7 @@ class ControllerTest {
     void updateReturnsNotFoundWhenMissing() throws Exception {
         given(service.update(eq(99L), any(ProductEntity.class))).willReturn(Optional.empty());
 
-        mockMvc.perform(put("/products/99")
+        mockMvc.perform(put("/products/99").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.TEN))))
                 .andExpect(status().isNotFound());
@@ -175,7 +176,7 @@ class ControllerTest {
         updated.setId(2L);
         given(service.update(eq(1L), any(ProductEntity.class))).willReturn(Optional.of(updated));
 
-        mockMvc.perform(put("/products/1")
+        mockMvc.perform(put("/products/1").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk());
@@ -186,7 +187,7 @@ class ControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void updateRequiresAdminRole() throws Exception {
-        mockMvc.perform(put("/products/1")
+        mockMvc.perform(put("/products/1").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.ONE))))
                 .andExpect(status().isForbidden());
@@ -197,7 +198,7 @@ class ControllerTest {
     void deleteReturnsNoContentWhenSuccessful() throws Exception {
         given(service.deleteById(1L)).willReturn(true);
 
-        mockMvc.perform(delete("/products/1"))
+        mockMvc.perform(delete("/products/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -206,14 +207,14 @@ class ControllerTest {
     void deleteReturnsNotFoundWhenMissing() throws Exception {
         given(service.deleteById(99L)).willReturn(false);
 
-        mockMvc.perform(delete("/products/99"))
+        mockMvc.perform(delete("/products/99").with(csrf()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(roles = "USER")
     void deleteRequiresAdminRole() throws Exception {
-        mockMvc.perform(delete("/products/1"))
+        mockMvc.perform(delete("/products/1").with(csrf()))
                 .andExpect(status().isForbidden());
     }
 }
