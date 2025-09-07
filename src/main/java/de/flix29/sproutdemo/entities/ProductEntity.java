@@ -1,6 +1,7 @@
 package de.flix29.sproutdemo.entities;
 
 import de.flix29.sprout.annotations.SproutId;
+import de.flix29.sprout.annotations.SproutPolicy;
 import de.flix29.sprout.annotations.SproutResource;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +15,12 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @SproutResource(path = "/products")
+@SproutPolicy(
+        read = "hasRole('ROLE_USER')",
+        create = "hasRole('ROLE_ADMIN')",
+        update = "hasRole('ROLE_ADMIN')",
+        delete = "hasRole('ROLE_ADMIN')"
+)
 @Entity(name = "Product")
 public class ProductEntity {
 

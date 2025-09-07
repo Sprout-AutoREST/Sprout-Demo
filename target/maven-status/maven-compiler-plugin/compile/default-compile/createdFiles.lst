@@ -1,0 +1,6 @@
+de/flix29/sproutdemo/entities/ProductEntity.class
+de/flix29/sproutdemo/SproutDemoApplication.class
+de/flix29/sproutdemo/entities/generated/marker/ProductEntitySproutMarker.class
+de/flix29/sproutdemo/entities/generated/controllers/SproutProductEntityController.class
+de/flix29/sproutdemo/entities/generated/services/SproutProductEntityService.class
+de/flix29/sproutdemo/entities/generated/repositories/SproutProductEntityRepository.class
