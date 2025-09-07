@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,6 +41,7 @@ class ControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
+    @WithMockUser(roles = "USER")
     void getAllReturnsProducts() throws Exception {
         given(service.findAll()).willReturn(List.of(new ProductEntity("Widget", BigDecimal.ONE)));
 
@@ -50,6 +52,7 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void getAllReturnsEmptyListWhenNoProducts() throws Exception {
         given(service.findAll()).willReturn(List.of());
 
@@ -61,6 +64,14 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "GUEST")
+    void getAllRequiresUserRole() throws Exception {
+        mockMvc.perform(get("/products"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
     void getByIdReturnsProduct() throws Exception {
         ProductEntity product = new ProductEntity("Widget", BigDecimal.ONE);
         product.setId(1L);
@@ -72,6 +83,7 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void getByIdReturnsNotFoundWhenMissing() throws Exception {
         given(service.findById(99L)).willReturn(Optional.empty());
 
@@ -80,6 +92,14 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "GUEST")
+    void getByIdRequiresUserRole() throws Exception {
+        mockMvc.perform(get("/products/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void createReturnsCreatedProduct() throws Exception {
         ProductEntity product = new ProductEntity("Widget", BigDecimal.ONE);
         product.setId(1L);
@@ -93,6 +113,7 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createInvalidProductReturnsBadRequest() throws Exception {
         ProductEntity invalidProduct = new ProductEntity("", BigDecimal.valueOf(-1));
 
@@ -103,6 +124,7 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void createInvalidMediaTypeReturnsUnsupportedMediaType() throws Exception {
         mockMvc.perform(post("/products")
                         .contentType(MediaType.TEXT_PLAIN)
@@ -111,6 +133,16 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
+    void createRequiresAdminRole() throws Exception {
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.ONE))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void updateReturnsUpdatedProduct() throws Exception {
         ProductEntity updated = new ProductEntity("Widget", BigDecimal.TEN);
         updated.setId(1L);
@@ -126,6 +158,7 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateReturnsNotFoundWhenMissing() throws Exception {
         given(service.update(eq(99L), any(ProductEntity.class))).willReturn(Optional.empty());
 
@@ -136,6 +169,7 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void updateIgnoreIdInBody() throws Exception {
         ProductEntity updated = new ProductEntity("Widget", BigDecimal.TEN);
         updated.setId(2L);
@@ -150,6 +184,16 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
+    void updateRequiresAdminRole() throws Exception {
+        mockMvc.perform(put("/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new ProductEntity("Widget", BigDecimal.ONE))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteReturnsNoContentWhenSuccessful() throws Exception {
         given(service.deleteById(1L)).willReturn(true);
 
@@ -158,10 +202,18 @@ class ControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void deleteReturnsNotFoundWhenMissing() throws Exception {
         given(service.deleteById(99L)).willReturn(false);
 
         mockMvc.perform(delete("/products/99"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void deleteRequiresAdminRole() throws Exception {
+        mockMvc.perform(delete("/products/1"))
+                .andExpect(status().isForbidden());
     }
 }
