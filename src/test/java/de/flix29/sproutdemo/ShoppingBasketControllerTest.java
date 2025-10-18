@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SproutShoppingBasketEntityController.class)
 @ImportAutoConfiguration(SproutMethodSecurityConfiguration.class)
+@WithMockUser(roles = "USER")
 class ShoppingBasketControllerTest {
 
     @Autowired
@@ -47,7 +48,6 @@ class ShoppingBasketControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(roles = "USER")
     void getAllReturnsShoppingBaskets() throws Exception {
         given(service.findAll()).willReturn(List.of(sampleBasket(1)));
 
@@ -58,7 +58,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     void getAllReturnsEmptyListWhenNoBaskets() throws Exception {
         given(service.findAll()).willReturn(List.of());
 
@@ -70,7 +69,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     void getByIdReturnsShoppingBasket() throws Exception {
         ShoppingBasketEntity basket = sampleBasket(1);
         given(service.findById(1)).willReturn(Optional.of(basket));
@@ -83,7 +81,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
     void getByIdReturnsNotFoundWhenMissing() throws Exception {
         given(service.findById(42)).willReturn(Optional.empty());
 
@@ -92,7 +89,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void createReturnsCreatedShoppingBasket() throws Exception {
         ShoppingBasketEntity created = sampleBasket(1);
         given(service.save(any(ShoppingBasketEntity.class))).willReturn(created);
@@ -106,7 +102,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void createInvalidMediaTypeReturnsUnsupportedMediaType() throws Exception {
         mockMvc.perform(post("/baskets").with(csrf())
                         .contentType(MediaType.TEXT_PLAIN)
@@ -115,7 +110,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void updateReturnsUpdatedShoppingBasket() throws Exception {
         ShoppingBasketEntity updated = sampleBasket(1);
         updated.getProducts().get(0).setPrice(BigDecimal.TEN);
@@ -130,7 +124,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void updateReturnsNotFoundWhenMissing() throws Exception {
         given(service.update(eq(99), any(ShoppingBasketEntity.class))).willReturn(Optional.empty());
 
@@ -141,7 +134,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void updateIgnoresIdInBody() throws Exception {
         ShoppingBasketEntity updated = sampleBasket(2);
         given(service.update(eq(1), any(ShoppingBasketEntity.class))).willReturn(Optional.of(updated));
@@ -155,7 +147,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void deleteReturnsNoContentWhenSuccessful() throws Exception {
         given(service.deleteById(1)).willReturn(true);
 
@@ -164,7 +155,6 @@ class ShoppingBasketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void deleteReturnsNotFoundWhenMissing() throws Exception {
         given(service.deleteById(99)).willReturn(false);
 
