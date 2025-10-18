@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SproutProductEntityController.class)
 @ImportAutoConfiguration(SproutMethodSecurityConfiguration.class)
-class ControllerTest {
+class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
