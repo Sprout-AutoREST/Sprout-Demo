@@ -1,8 +1,11 @@
 package de.flix29.sproutdemo;
 
 import de.flix29.sproutdemo.entities.generated.controllers.SproutProductEntityController;
+import de.flix29.sproutdemo.entities.generated.controllers.SproutShoppingBasketEntityController;
 import de.flix29.sproutdemo.entities.generated.repositories.SproutProductEntityRepository;
+import de.flix29.sproutdemo.entities.generated.repositories.SproutShoppingBasketEntityRepository;
 import de.flix29.sproutdemo.entities.generated.services.SproutProductEntityService;
+import de.flix29.sproutdemo.entities.generated.services.SproutShoppingBasketEntityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,24 +16,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SproutDemoApplicationTests {
 
     @Autowired
-    private SproutProductEntityRepository repo;
+    private SproutProductEntityRepository sproutProductEntityRepository;
     @Autowired
-    private SproutProductEntityService service;
+    private SproutProductEntityService sproutProductEntityService;
     @Autowired
-    private SproutProductEntityController controller;
+    private SproutProductEntityController sproutProductEntityController;
+
+    @Autowired
+    private SproutShoppingBasketEntityRepository sproutShoppingBasketEntityRepository;
+    @Autowired
+    private SproutShoppingBasketEntityService sproutShoppingBasketEntityService;
+    @Autowired
+    private SproutShoppingBasketEntityController sproutShoppingBasketEntityController;
 
     @Test
     void repoBeanExists() {
-        assertThat(repo).isNotNull();
+        assertThat(sproutProductEntityRepository).isNotNull();
+        assertThat(sproutShoppingBasketEntityRepository).isNotNull();
     }
 
     @Test
     void serviceBeanExists() {
-        assertThat(service).isNotNull();
+        assertThat(sproutProductEntityService).isNotNull();
+        assertThat(sproutShoppingBasketEntityService).isNotNull();
     }
 
     @Test
     void controllerBeanExists() {
-        assertThat(controller).isNotNull();
+        assertThat(sproutProductEntityController).isNotNull();
+        assertThat(sproutShoppingBasketEntityController).isNotNull();
     }
 }
