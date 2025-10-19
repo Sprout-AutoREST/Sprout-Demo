@@ -76,7 +76,7 @@ class SmokeTest {
     @Test
     void postBaskets_Response_Created() {
         ShoppingBasketEntity basket = newBasket();
-        ResponseEntity<ShoppingBasketEntity> response = admin().postForEntity("/baskets", basket, ShoppingBasketEntity.class);
+        ResponseEntity<ShoppingBasketEntity> response = user().postForEntity("/baskets", basket, ShoppingBasketEntity.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getId()).isNotNull();
@@ -94,7 +94,7 @@ class SmokeTest {
     void deleteBaskets_Response_OK() {
         Integer id = saveBasket();
 
-        ResponseEntity<String> deleteResponse = admin().exchange("/baskets/{id}", HttpMethod.DELETE, HttpEntity.EMPTY, String.class, id);
+        ResponseEntity<String> deleteResponse = user().exchange("/baskets/{id}", HttpMethod.DELETE, HttpEntity.EMPTY, String.class, id);
         assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<String> response = user().getForEntity("/baskets/{id}", String.class, id);
@@ -111,7 +111,7 @@ class SmokeTest {
 
     private Integer saveBasket() {
         ShoppingBasketEntity basket = newBasket();
-        var created = admin().postForEntity("/baskets", basket, ShoppingBasketEntity.class);
+        var created = user().postForEntity("/baskets", basket, ShoppingBasketEntity.class);
         assertThat(created.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(created.getBody()).isNotNull();
         assertThat(created.getBody().getId()).isNotNull();
@@ -120,7 +120,7 @@ class SmokeTest {
 
     private ShoppingBasketEntity newBasket() {
         ShoppingBasketEntity basket = new ShoppingBasketEntity();
-        ProductEntity product = new ProductEntity("Chemex Filters", new BigDecimal("12.50"));
+        ProductEntity product = new ProductEntity("Product", new BigDecimal("12.50"));
         basket.setProducts(List.of(product));
 
         UserEntity user = new UserEntity();
