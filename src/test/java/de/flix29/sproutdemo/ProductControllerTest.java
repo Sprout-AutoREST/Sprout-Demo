@@ -2,16 +2,20 @@ package de.flix29.sproutdemo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.flix29.sprout.runtime.security.SproutMethodSecurityConfiguration;
+import de.flix29.sproutdemo.customService.CustomProduktService;
 import de.flix29.sproutdemo.entities.ProductEntity;
 import de.flix29.sproutdemo.entities.generated.controllers.SproutProductEntityController;
+import de.flix29.sproutdemo.entities.generated.repositories.SproutProductEntityRepository;
 import de.flix29.sproutdemo.entities.generated.services.SproutProductEntityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -33,13 +37,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SproutProductEntityController.class)
 @ImportAutoConfiguration(SproutMethodSecurityConfiguration.class)
+@Import({SproutProductEntityService.class, CustomProduktService.class})
 class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @MockitoSpyBean
     private SproutProductEntityService service;
+
+    @MockitoSpyBean
+    private CustomProduktService customProduktService;
+
+    @MockitoBean
+    private SproutProductEntityRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -53,6 +64,8 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].name").value("Widget"));
+
+        verify(customProduktService).findAll();
     }
 
     @Test
