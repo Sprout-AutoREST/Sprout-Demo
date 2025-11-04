@@ -11,7 +11,7 @@
     <properties>
         <java.version>21</java.version>
         <spring-boot.version>3.5.5</spring-boot.version>
-        <sprout.version>0.0.1-SNAPSHOT</sprout.version>
+        <sprout.version>1.0.0</sprout.version>
     </properties>
 
     <dependencyManagement>
