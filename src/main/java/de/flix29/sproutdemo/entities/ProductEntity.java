@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
-@SproutResource(path = "/products")
+@SproutResource(path = "/products", summary = "Operations related to products")
 @SproutPolicy(
         read = "hasRole('ROLE_USER')",
         create = "hasRole('ROLE_ADMIN')",

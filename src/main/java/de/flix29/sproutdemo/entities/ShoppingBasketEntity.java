@@ -13,7 +13,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-@SproutResource(path = "/baskets")
+@SproutResource(path = "/baskets", name = "ShoppingBasket")
 @Entity(name = "ShoppingBasket")
 public class ShoppingBasketEntity {
 

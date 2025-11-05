@@ -1,11 +1,11 @@
 package de.flix29.sproutdemo;
 
 import de.flix29.sproutdemo.entities.generated.controllers.SproutProductEntityController;
-import de.flix29.sproutdemo.entities.generated.controllers.SproutShoppingBasketEntityController;
+import de.flix29.sproutdemo.entities.generated.controllers.SproutShoppingBasketController;
 import de.flix29.sproutdemo.entities.generated.repositories.SproutProductEntityRepository;
-import de.flix29.sproutdemo.entities.generated.repositories.SproutShoppingBasketEntityRepository;
+import de.flix29.sproutdemo.entities.generated.repositories.SproutShoppingBasketRepository;
 import de.flix29.sproutdemo.entities.generated.services.SproutProductEntityService;
-import de.flix29.sproutdemo.entities.generated.services.SproutShoppingBasketEntityService;
+import de.flix29.sproutdemo.entities.generated.services.SproutShoppingBasketService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,11 +23,11 @@ class SproutDemoApplicationTests {
     private SproutProductEntityController sproutProductEntityController;
 
     @Autowired
-    private SproutShoppingBasketEntityRepository sproutShoppingBasketEntityRepository;
+    private SproutShoppingBasketRepository sproutShoppingBasketEntityRepository;
     @Autowired
-    private SproutShoppingBasketEntityService sproutShoppingBasketEntityService;
+    private SproutShoppingBasketService sproutShoppingBasketEntityService;
     @Autowired
-    private SproutShoppingBasketEntityController sproutShoppingBasketEntityController;
+    private SproutShoppingBasketController sproutShoppingBasketEntityController;
 
     @Test
     void repoBeanExists() {
