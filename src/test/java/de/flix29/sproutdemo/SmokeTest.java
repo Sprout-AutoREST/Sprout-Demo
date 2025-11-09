@@ -95,10 +95,7 @@ class SmokeTest {
         Integer id = saveBasket();
 
         ResponseEntity<String> deleteResponse = user().exchange("/baskets/{id}", HttpMethod.DELETE, HttpEntity.EMPTY, String.class, id);
-        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        ResponseEntity<String> response = user().getForEntity("/baskets/{id}", String.class, id);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     private long save() {

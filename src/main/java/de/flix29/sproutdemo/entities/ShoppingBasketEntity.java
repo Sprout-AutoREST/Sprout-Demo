@@ -1,6 +1,7 @@
 package de.flix29.sproutdemo.entities;
 
 import de.flix29.sprout.annotations.SproutResource;
+import de.flix29.sprout.annotations.model.Endpoint;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-@SproutResource(path = "/baskets", name = "ShoppingBasket")
+@SproutResource(path = "/baskets", name = "ShoppingBasket", exclude = {Endpoint.UPDATE, Endpoint.DELETE})
 @Entity(name = "ShoppingBasket")
 public class ShoppingBasketEntity {
 

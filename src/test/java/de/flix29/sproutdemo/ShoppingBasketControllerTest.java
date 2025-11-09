@@ -23,7 +23,6 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -118,32 +117,7 @@ class ShoppingBasketControllerTest {
         mockMvc.perform(put("/baskets/1").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updated)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.products[0].price").value(10));
-    }
-
-    @Test
-    void updateReturnsNotFoundWhenMissing() throws Exception {
-        given(service.update(eq(99), any(ShoppingBasketEntity.class))).willReturn(Optional.empty());
-
-        mockMvc.perform(put("/baskets/99").with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleBasket(null))))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void updateIgnoresIdInBody() throws Exception {
-        ShoppingBasketEntity updated = sampleBasket(2);
-        given(service.update(eq(1), any(ShoppingBasketEntity.class))).willReturn(Optional.of(updated));
-
-        mockMvc.perform(put("/baskets/1").with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updated)))
-                .andExpect(status().isOk());
-
-        verify(service).update(eq(1), any(ShoppingBasketEntity.class));
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
@@ -151,15 +125,7 @@ class ShoppingBasketControllerTest {
         given(service.deleteById(1)).willReturn(true);
 
         mockMvc.perform(delete("/baskets/1").with(csrf()))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void deleteReturnsNotFoundWhenMissing() throws Exception {
-        given(service.deleteById(99)).willReturn(false);
-
-        mockMvc.perform(delete("/baskets/99").with(csrf()))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isMethodNotAllowed());
     }
 
     private ShoppingBasketEntity sampleBasket(Integer id) {
