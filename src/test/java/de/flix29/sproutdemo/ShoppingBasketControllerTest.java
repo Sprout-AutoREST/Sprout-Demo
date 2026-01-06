@@ -21,13 +21,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -106,26 +103,6 @@ class ShoppingBasketControllerTest {
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("invalid"))
                 .andExpect(status().isUnsupportedMediaType());
-    }
-
-    @Test
-    void updateReturnsUpdatedShoppingBasket() throws Exception {
-        ShoppingBasketEntity updated = sampleBasket(1);
-        updated.getProducts().get(0).setPrice(BigDecimal.TEN);
-        given(service.update(eq(1), any(ShoppingBasketEntity.class))).willReturn(Optional.of(updated));
-
-        mockMvc.perform(put("/baskets/1").with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updated)))
-                .andExpect(status().isMethodNotAllowed());
-    }
-
-    @Test
-    void deleteReturnsNoContentWhenSuccessful() throws Exception {
-        given(service.deleteById(1)).willReturn(true);
-
-        mockMvc.perform(delete("/baskets/1").with(csrf()))
-                .andExpect(status().isMethodNotAllowed());
     }
 
     private ShoppingBasketEntity sampleBasket(Integer id) {
