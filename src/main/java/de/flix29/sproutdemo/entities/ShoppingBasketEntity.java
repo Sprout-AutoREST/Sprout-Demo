@@ -14,7 +14,12 @@ import jakarta.persistence.OneToMany;
 
 import java.util.List;
 
-@SproutResource(path = "/baskets", name = "ShoppingBasket", exclude = {Endpoint.UPDATE, Endpoint.DELETE})
+@SproutResource(
+        path = "/baskets",
+        name = "ShoppingBasket",
+        exclude = {Endpoint.UPDATE, Endpoint.DELETE},
+        authenticationPrincipal = true
+)
 @Entity(name = "ShoppingBasket")
 public class ShoppingBasketEntity {
 

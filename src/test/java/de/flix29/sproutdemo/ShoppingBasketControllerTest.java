@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,7 +46,7 @@ class ShoppingBasketControllerTest {
 
     @Test
     void getAllReturnsShoppingBaskets() throws Exception {
-        given(service.findAll()).willReturn(List.of(sampleBasket(1)));
+        given(service.findAll(any())).willReturn(List.of(sampleBasket(1)));
 
         mockMvc.perform(get("/baskets").with(csrf()))
                 .andExpect(status().isOk())
@@ -55,7 +56,7 @@ class ShoppingBasketControllerTest {
 
     @Test
     void getAllReturnsEmptyListWhenNoBaskets() throws Exception {
-        given(service.findAll()).willReturn(List.of());
+        given(service.findAll(any())).willReturn(List.of());
 
         mockMvc.perform(get("/baskets").with(csrf()))
                 .andExpect(status().isOk())
@@ -67,7 +68,7 @@ class ShoppingBasketControllerTest {
     @Test
     void getByIdReturnsShoppingBasket() throws Exception {
         ShoppingBasketEntity basket = sampleBasket(1);
-        given(service.findById(1)).willReturn(Optional.of(basket));
+        given(service.findById(eq(1), any())).willReturn(Optional.of(basket));
 
         mockMvc.perform(get("/baskets/1").with(csrf()))
                 .andExpect(status().isOk())
@@ -78,7 +79,7 @@ class ShoppingBasketControllerTest {
 
     @Test
     void getByIdReturnsNotFoundWhenMissing() throws Exception {
-        given(service.findById(42)).willReturn(Optional.empty());
+        given(service.findById(eq(42), any())).willReturn(Optional.empty());
 
         mockMvc.perform(get("/baskets/42").with(csrf()))
                 .andExpect(status().isNotFound());
@@ -87,7 +88,7 @@ class ShoppingBasketControllerTest {
     @Test
     void createReturnsCreatedShoppingBasket() throws Exception {
         ShoppingBasketEntity created = sampleBasket(1);
-        given(service.save(any(ShoppingBasketEntity.class))).willReturn(created);
+        given(service.save(any(ShoppingBasketEntity.class), any())).willReturn(created);
 
         mockMvc.perform(post("/baskets").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
